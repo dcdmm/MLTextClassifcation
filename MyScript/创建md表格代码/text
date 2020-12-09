@@ -1,0 +1,6 @@
+os.curdir                     指代当前目录（'.'）
+os.pardir                     指代上一级目录（'..'）
+os.sep                        输出操作系统特定的路径分隔符（Win下为'\\'，Linux下为'/'）
+os.linesep                    当前平台使用的行终止符（Win下为'\r\n'，Linux下为'\n'）
+os.name                       指代当前使用的操作系统（包括：'posix',  'nt', 'mac', 'os2', 'ce', 'java'）
+os.pathsep                    用于分割文件路径的字符串
