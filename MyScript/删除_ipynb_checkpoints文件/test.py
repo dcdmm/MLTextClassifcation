@@ -25,12 +25,12 @@ def find_file(catalog):
 
 def remove_checkpoints(file_path_lst):
     """ 删除所有的.ipynb_checkpoints文件夹 """
-    print(file_path_lst)
     if not file_path_lst:
         print("没有.ipynb文件夹")
     else:
         print('.ipynb文件夹共有', len(file_path_lst), '个')
-        input_remove = input('是否全部进行删除?yes or no')
+        print(file_path_lst)
+        input_remove = input('是否全部进行删除?yes or no\n')
         if input_remove == "yes":
             for i in file_path_lst:
                 print(i, "被删除!")
