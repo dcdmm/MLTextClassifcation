@@ -4,11 +4,10 @@ import numpy as np
 from sklearn.model_selection import KFold
 import lightgbm as lgb
 
-path = os.path.abspath('../..')
-path = path + "/utility"
-sys.path.append(path)  # 添加到临时path变量中
+path = os.path.abspath('../../utility')
+sys.path.append(path)  # 添加第三方模块路径到临时path变量中
 
-from evaluation_index import *
+from evaluation_index import *  # pycharm显示报错不用理会
 
 
 def feval_rmspe(y_pred, lgb_train):
