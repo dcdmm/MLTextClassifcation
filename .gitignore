@@ -6,5 +6,7 @@
 *.idea
 .ipynb_checkpoints
 *.iml
+data_init
+data_feature
 out
 gen
