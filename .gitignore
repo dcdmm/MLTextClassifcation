@@ -5,8 +5,10 @@
 # IntelliJ project files
 *.idea
 .ipynb_checkpoints
-*.iml
-data_init
-data_feature
-out
-gen
+
+
+# Optiver_Realized_Volatility_Prediction比赛(储存位置:百度网盘)
+# 原始数据
+Competition/Optiver_Realized_Volatility_Prediction/data_init
+# 中间数据
+Competition/Optiver_Realized_Volatility_Prediction/data_feature
