@@ -12,3 +12,5 @@
 Competition/Optiver_Realized_Volatility_Prediction/data_init
 # 中间数据
 Competition/Optiver_Realized_Volatility_Prediction/data_feature
+# 训练结果数据
+Competition/Optiver_Realized_Volatility_Prediction/result
