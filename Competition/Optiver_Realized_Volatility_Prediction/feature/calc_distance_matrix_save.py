@@ -44,4 +44,4 @@ def calc_distance_matrix(data_dir):
 if __name__ == "__main__":
     data_dir = "../data_init/"
     d_df = calc_distance_matrix(data_dir)
-    d_df.to_pickle("../data_feature/d_df.pkl")
+    d_df.to_csv("../data_feature/d_df.csv")

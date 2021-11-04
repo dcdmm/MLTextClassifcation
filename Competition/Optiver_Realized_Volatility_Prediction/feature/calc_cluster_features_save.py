@@ -75,8 +75,8 @@ def calc_cluster_features(data_dir, train, test):
 
 if __name__ == "__main__":
     data_path = "../data_init/train.csv"
-    train_data = pd.read_pickle("../data_feature/train_tick.pkl")
-    test_data = pd.read_pickle("../data_feature/test_tick.pkl")
+    train_data = pd.read_csv("../data_feature/train_tick.csv", header=0, index_col=0)
+    test_data = pd.read_csv("../data_feature/test_tick.csv", header=0, index_col=0)
     train_data, test_data = calc_cluster_features(data_path, train_data, test_data)
-    train_data.to_pickle("../data_feature/train_last.pkl")
-    test_data.to_pickle("../data_feature/test_last.pkl")
+    train_data.to_csv("../data_feature/train_last.csv")
+    test_data.to_csv("../data_feature/test_last.csv")

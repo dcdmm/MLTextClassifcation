@@ -6,7 +6,13 @@
 *.idea
 .ipynb_checkpoints
 
+# .pyc文件是.py文件编译后生成的字节码文件(byte code),类似Java的.class文件
+*.pyc
 
+
+
+
+# *******************************************************************************************
 # Optiver_Realized_Volatility_Prediction比赛(储存位置:百度网盘)
 # 原始数据
 Competition/Optiver_Realized_Volatility_Prediction/data_init

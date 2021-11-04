@@ -58,5 +58,5 @@ if __name__ == '__main__':
     test_data = get_time_agg(test_data)
     train_data = calc_taus(train_data)
     test_data = calc_taus(test_data)
-    train_data.to_pickle("../data_feature/train_raw.pkl")
-    test_data.to_pickle("../data_feature/test_raw.pkl")
+    train_data.to_csv("../data_feature/train_raw.csv")
+    test_data.to_csv("../data_feature/test_raw.csv")
