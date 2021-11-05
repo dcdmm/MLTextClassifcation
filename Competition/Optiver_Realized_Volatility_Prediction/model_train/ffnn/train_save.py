@@ -4,14 +4,7 @@ import tensorflow as tf
 from ffnn_model import MyFFNN
 from tensorflow import keras
 import pandas as pd
-import os
-import sys
 import gc
-
-path = os.path.abspath('../../util')
-sys.path.append(path)  # 添加第三方模块路径到临时path变量中
-
-from evaluation_index import *  # pycharm显示报错不用理会
 
 
 def process_nn_data(train, test, colNames):
@@ -21,7 +14,7 @@ def process_nn_data(train, test, colNames):
     train_nn = train[colNames].copy()
     test_nn = test[colNames].copy()
 
-    # 分位数正态分布缩放
+    # 数据预处理:分位数正态分布缩放
     for col in colNames:
         qt = QuantileTransformer(random_state=21, n_quantiles=2000, output_distribution='normal')
         train_nn[col] = qt.fit_transform(train_nn[[col]])
@@ -96,7 +89,7 @@ def train_and_evaluate_nn(train_nn, test_nn, kfolds, colNames, hidden_units, out
             preds = model.predict([cat_data_test, num_data_test]).reshape(1, -1)[0]
             oof_predictions_nn[val_ind] += preds
 
-            score = round(rmspe(y_true=y_test, y_pred=preds), 5)
+            score = root_mean_squared_per_error(y_true=y_test, y_pred=preds)
             print('Fold {}/{}: {}'.format(fold, ff, score))
 
             test_predictions_nn += \
@@ -110,7 +103,7 @@ def train_and_evaluate_nn(train_nn, test_nn, kfolds, colNames, hidden_units, out
 
     test_predictions_nn = test_predictions_nn / 15.0
     oof_predictions_nn = oof_predictions_nn / 3.0
-    rmspe_score = rmspe(train_nn['target'], oof_predictions_nn)
+    rmspe_score = root_mean_squared_per_error(train_nn['target'], oof_predictions_nn)
     print(f'Our out of folds RMSPE is {rmspe_score}')
 
     return test_predictions_nn, oof_predictions_nn

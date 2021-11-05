@@ -29,7 +29,8 @@ def calc_tick_features(train, test, d_df):
 
     ma_list_0 = [5]
     mas_0 = [[pd.DataFrame(
-        tick_df[tick_df.time_id.isin(list(d_df.iloc[:, range(ma)].loc[idx].values))].groupby('stock_id')[feats].quantile(
+        tick_df[tick_df.time_id.isin(list(d_df.iloc[:, range(ma)].loc[idx].values))].groupby('stock_id')[
+            feats].quantile(
             [0.25, 0.5, 0.75]).unstack()) for idx in d_df.index] for ma in ma_list_0]
 
     train, test = merge_feature(train, test, ma_list_0, mas_0)
@@ -45,7 +46,8 @@ def calc_tick_features(train, test, d_df):
 
     ma_list_2 = [100, 200, 500]
     mas_2 = [[pd.DataFrame(
-        tick_df[tick_df.time_id.isin(list(d_df.iloc[:, range(ma)].loc[idx].values))].groupby('stock_id')[feats].agg([np.mean]))
+        tick_df[tick_df.time_id.isin(list(d_df.iloc[:, range(ma)].loc[idx].values))].groupby('stock_id')[feats].agg(
+            [np.mean]))
         for idx in d_df.index] for ma in ma_list_2]
 
     train, test = merge_feature(train, test, ma_list_2, mas_2)

@@ -32,7 +32,7 @@ def calc_distance_matrix(data_dir):
     # Minmax scale
     df_prices = pd.DataFrame(minmax_scale(df_prices), index=df_prices.index)
     # Calculate distance matrix
-    d_mat = pairwise_distances(df_prices.values)
+    d_mat = pairwise_distances(df_prices.values)  # 得到数据产出顺序
 
     # Sort each row so we have time_ids sorted by distance to the rows time_id
     for row in range(d_mat.shape[0]):
@@ -40,6 +40,7 @@ def calc_distance_matrix(data_dir):
 
     d_df = pd.DataFrame(d_mat, index=df_prices.index).astype(int)
     return d_df
+
 
 if __name__ == "__main__":
     data_dir = "../data_init/"

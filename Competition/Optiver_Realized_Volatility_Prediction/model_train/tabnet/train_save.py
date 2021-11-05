@@ -45,7 +45,7 @@ def process_tabnet_data(train, test):
     categorical_columns = []
     categorical_dims = {}
 
-    # 标签编码与数据缩放
+    # 数据预处理:标签编码与数据缩放
     for col in X_train.columns:
         if col == 'stock_id':
             l_enc = LabelEncoder()
