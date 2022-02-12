@@ -48,5 +48,5 @@ def remove_checkpoints(file_path_lst):
 
 
 if __name__ == '__main__':
-    icp_lst = find_checkpoints(r'D:\GitHubProjects')
+    icp_lst = find_checkpoints(r'C:\Users\duanm\Music\GitHubProjects')
     remove_checkpoints(icp_lst)

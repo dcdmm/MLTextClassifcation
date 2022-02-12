@@ -1,11 +1,5 @@
-### MyProject
+### Competition
 
-* kaggle:Optiver Realized Volatility Predictio
+### Subject
 
-### MyScript
-
-* 删除ipynb_checkpoints文件
-
-### OtherProject
-
-* 基础文本聚类
+### Script
