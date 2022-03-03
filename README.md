@@ -1,5 +1,0 @@
-### Competition
-
-### Subject
-
-### Script
