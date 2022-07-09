@@ -4,9 +4,6 @@ import torch
 from transformers import BertTokenizer
 
 
-def print_hel():
-    print('323')
-
 class Dataset(Data.Dataset):
     """定义数据集"""
 
@@ -24,7 +21,9 @@ class Dataset(Data.Dataset):
         return text, label
 
 
-def get_collate_fn(tokenizer):
+def get_collate_fn(tokenizer, max_len=512):
+    """返回collate_fun函数(通过闭包函数引入形参)"""
+
     def collate_fn(data):
         model_input_names = tokenizer.model_input_names
         sents = [i[0] for i in data]
@@ -33,7 +32,7 @@ def get_collate_fn(tokenizer):
         text_token = tokenizer(text=sents,
                                truncation=True,
                                padding='max_length',
-                               max_length=141,
+                               max_length=max_len,
                                return_token_type_ids=True,
                                return_attention_mask=True,
                                return_tensors='pt')
@@ -41,7 +40,7 @@ def get_collate_fn(tokenizer):
         for name in model_input_names:
             result[name] = text_token[name]
 
-        labels = [i[1] - 1 for i in data]
+        labels = [i[1] - 1 for i in data]  # ★★★★使分类标签从0开始
         labels = torch.LongTensor(labels)
         result['labels'] = labels  # ★★★★对应模型forward方法labels参数
         return result
@@ -56,6 +55,3 @@ if __name__ == '__main__':
     for i in dataLoader:
         print(i)
         break
-
-
-

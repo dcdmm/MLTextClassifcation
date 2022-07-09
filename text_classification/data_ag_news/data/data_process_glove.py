@@ -38,7 +38,7 @@ class DataProcess:
     def get_dataLoader(self,
                        text_max_len):  # 句子最大长度(超过该长度将被截断)
         r"""获取DataLoade"""
-        label_pipeline = lambda label: int(label) - 1  # 使分类标签从0开始
+        label_pipeline = lambda label: int(label) - 1  # ★★★★使分类标签从0开始
         text_pipeline = lambda line: [self.vocab([i])[0] for i in self.tokenizer(line)]
 
         def collate_batch(batch):
@@ -82,8 +82,8 @@ class DataProcess:
     def truncate_pad(line, text_max_len, padding_token):
         r"""截断或填充文本序列"""
         if len(line) > text_max_len:
-            return line[:text_max_len]  # 句子截断
-        return line + [padding_token] * (text_max_len - len(line))  # 句子填充
+            return line[:text_max_len]  # 句子截断(句子长度>text_max_len时)
+        return line + [padding_token] * (text_max_len - len(line))  # 句子填充(句子长度<text_max_len时)
 
 
 if __name__ == '__main__':

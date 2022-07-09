@@ -2,13 +2,13 @@ import torch
 
 
 class Bert_base(torch.nn.Module):
-    """下游训练任务模型"""
+    """Bert + Linear基础模型"""
 
     def __init__(self, pretrained_model, num_class, criterion):
         super().__init__()
-        self.fc = torch.nn.Linear(768, num_class)  # 二分类任务
+        self.fc = torch.nn.Linear(768, num_class)
         self.pretrained = pretrained_model
-        self.criterion = torch.nn.CrossEntropyLoss()
+        self.criterion = criterion
 
     def forward(self, input_ids, attention_mask, token_type_ids, labels=None):
         out = self.pretrained(input_ids=input_ids,
@@ -29,7 +29,7 @@ class Bert_base(torch.nn.Module):
         # * 验证数据集评估函数指标的计算
         # * predict方法预测结果(predictions)与评估结果(metrics)(结合输入labels)的计算
         if loss is not None:
-            return (loss, out)
+            return loss, out
         # 预测阶段
         # ★★★★★
         # 返回值为模型的预测结果

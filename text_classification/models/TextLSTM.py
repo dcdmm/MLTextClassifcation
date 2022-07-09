@@ -5,7 +5,7 @@ from abc import ABC
 
 class TextLSTM(nn.Module, ABC):
     """
-    TextRNN模型的pytorch实现(具体任务对应修改)
+    TextRNN(LSTM)模型的pytorch实现(具体任务对应修改)
 
     Parameters
     ---------
@@ -54,8 +54,8 @@ class TextLSTM(nn.Module, ABC):
             pack_embedded = nn.utils.rnn.pack_padded_sequence(embedded, text_lengths,
                                                               enforce_sorted=False)  # pack sequence
 
-            # hidden.shape=[batch_size, num_layers * num directions, hidden_size]
-            # cell.shape=[batch_size, num_layers * num directions, hidden_size]
+            # hidden.shape=[num_layers * num directions, batch_size, hidden_size]
+            # cell.shape=[num_layers * num directions, batch_size, hidden_size]
             pack_out, (hidden, cell) = self.rnn(pack_embedded)
 
             # Pads a packed batch of variable length sequences;pack_padded_sequence的反运算
@@ -64,11 +64,9 @@ class TextLSTM(nn.Module, ABC):
         else:
             out_normal, (hidden, cell) = self.rnn(embedded)
         if self.bidirectional:  # 双向时
-            # hidden.shape= [num_layers * num directions, batch_size, hid dim]
-            # hidden_.shape = [batch_size, hid dim * num directions]
-            hidden_ = self.dropout(torch.cat((hidden[-2, :, :], hidden[-1, :, :]), dim=1))  # 利用前向和后向的信息
+            # hidden_.shape = [batch_size, hidden_size * num directions]
+            hidden_ = self.dropout(torch.cat((hidden[-2, :, :], hidden[-1, :, :]), dim=1))  # 利用前向和后向最后一个序列的信息
         else:
             hidden_ = self.dropout(hidden[-1, :, :])
-        result = self.linear(hidden_)  # result.shape=[batch_size, out_size]
+        result = self.linear(hidden_)  # result.shape=[batch_size, num_class]
         return result
-
