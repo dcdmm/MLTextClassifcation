@@ -42,10 +42,8 @@ class TextRNN_att(nn.Module):
         self.linear = nn.Linear(hidden_size * mul, num_class)
         self.dropout = nn.Dropout(dropout_ratio)
 
-        self.W_omega = nn.Parameter(torch.Tensor(hidden_size * mul, hidden_size * mul))  # 即W_{omega}
-        self.u_omega = nn.Parameter(torch.Tensor(hidden_size * mul, 1))  # 即u_{omega}
-        nn.init.uniform_(self.w_omega, -0.1, 0.1)
-        nn.init.uniform_(self.u_omega, -0.1, 0.1)
+        self.W_w_b_w = nn.Linear(hidden_size * mul, hidden_size * mul)  # 可学习参数:W_w, b_w
+        self.u_w = nn.Linear(hidden_size * mul, 1, bias=False)  # 可学习参数:u_w
 
     def forward(self, text):
         # text.shape=[batch_size, sent len]
@@ -56,11 +54,11 @@ class TextRNN_att(nn.Module):
         out, hidden = self.rnn(embedded)
 
         # *************************Attention过程*************************
-        # Q,K,V都是out(类似加性注意力);可学习参数为:self.W_omega,self.u_omega
+        # Q,K,V都是out(类似加性注意力)
         # u.shape=[batch_size, sen len, hidden_size * num directions]
-        u = torch.tanh(torch.matmul(out, self.W_omega))
+        u = self.W_w_b_w(out)
         # att.shape=[batch_size, sen len, 1]
-        att = torch.matmul(u, self.u_omega)
+        att = self.u_w(u)
         att_score = F.softmax(att, dim=1)
         # score_out.shape=[batch_size, sen len, hidden_size * num directions]  # 广播机制
         score_out = out * att_score
