@@ -4,7 +4,7 @@ import torch
 
 class BertRNN(nn.Module):
     """
-    BertRNN(类似TextRNN)模型的pytorch实现(具体任务对应修改)
+    BertRNN(类似TextRNN)模型的pytorch实现(具体任务对应修改)(transformer实现训练过程)
 
     Parameters
     ---------

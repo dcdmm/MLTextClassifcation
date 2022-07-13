@@ -33,7 +33,8 @@ class TextRNN_att(nn.Module):
                           hidden_size=hidden_size,
                           num_layers=num_layers,
                           bidirectional=self.bidirectional,
-                          dropout=dropout_ratio, batch_first=True)
+                          dropout=dropout_ratio,
+                          batch_first=True)  # batch_size为第一个维度
 
         if self.bidirectional:
             mul = 2

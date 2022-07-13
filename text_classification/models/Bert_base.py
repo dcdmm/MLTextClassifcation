@@ -2,7 +2,7 @@ import torch
 
 
 class Bert_base(torch.nn.Module):
-    """Bert + Linear基础模型"""
+    """Bert + Linear基础模型(transformer实现训练过程)"""
 
     def __init__(self, pretrained_model, num_class, criterion):
         super().__init__()

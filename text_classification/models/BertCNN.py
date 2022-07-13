@@ -4,7 +4,7 @@ import torch
 
 class BertCNN(nn.Module):
     """
-    BertCNN(类似TextCNN)模型的pytorch实现(具体任务对应修改)
+    BertCNN(类似TextCNN)模型的pytorch实现(具体任务对应修改)(transformer实现训练过程)
 
     Parameters
     ---------
