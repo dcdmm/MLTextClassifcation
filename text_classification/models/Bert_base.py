@@ -1,21 +1,24 @@
 import torch
+import torch.nn as nn
 
 
 class Bert_base(torch.nn.Module):
     """Bert + Linear基础模型(transformer实现训练过程)"""
 
-    def __init__(self, pretrained_model, num_class, criterion):
+    def __init__(self, pretrained_model, num_class, criterion, dropout_ratio=0.1):
         super().__init__()
         self.fc = torch.nn.Linear(768, num_class)
         self.pretrained = pretrained_model
         self.criterion = criterion
+        self.dropout = nn.Dropout(dropout_ratio)
 
     def forward(self, input_ids, attention_mask, token_type_ids, labels=None):
         out = self.pretrained(input_ids=input_ids,
                               attention_mask=attention_mask,
                               token_type_ids=token_type_ids)
 
-        out = self.fc(out.pooler_output)
+
+        out = self.fc(self.dropout(out.pooler_output))
         out = out.softmax(dim=1)
         loss = None
         if labels is not None:  # 若包含标签
