@@ -24,7 +24,7 @@ class BertRNN(nn.Module):
         元素归零的概率
     """
 
-    def __init__(self, pretrained_model, num_class, criterion, hidden_size, num_layers, bidirectional, dropout_ratio=0.1):
+    def __init__(self, pretrained_model, num_class, criterion, hidden_size, num_layers, bidirectional, dropout_ratio=0.3):
         super(BertRNN, self).__init__()
         self.pretrained = pretrained_model
         self.criterion = criterion

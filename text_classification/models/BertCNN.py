@@ -23,7 +23,7 @@ class BertCNN(nn.Module):
         dropout层p值
     """
 
-    def __init__(self, pretrained_model, num_class, criterion, kernel_sizes, num_channels, dropout_ratio=0.1):
+    def __init__(self, pretrained_model, num_class, criterion, kernel_sizes, num_channels, dropout_ratio=0.3):
         super(BertCNN, self).__init__()
         self.pretrained = pretrained_model
         self.criterion = criterion

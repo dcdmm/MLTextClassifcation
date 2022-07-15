@@ -5,7 +5,7 @@ import torch.nn as nn
 class Bert_base(torch.nn.Module):
     """Bert + Linear基础模型(transformer实现训练过程)"""
 
-    def __init__(self, pretrained_model, num_class, criterion, dropout_ratio=0.1):
+    def __init__(self, pretrained_model, num_class, criterion, dropout_ratio=0.3):
         super().__init__()
         self.fc = torch.nn.Linear(768, num_class)
         self.pretrained = pretrained_model

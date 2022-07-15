@@ -25,7 +25,7 @@ class TextGRU(nn.Module, ABC):
         元素归零的概率
     """
 
-    def __init__(self, num_class, vocab_size, embedding_size, hidden_size, num_layers, bidirectional, dropout_ratio=0.1):
+    def __init__(self, num_class, vocab_size, embedding_size, hidden_size, num_layers, bidirectional, dropout_ratio=0.3):
         super(TextGRU, self).__init__()
         self.bidirectional = bidirectional
         self.embed = nn.Embedding(vocab_size, embedding_size)
