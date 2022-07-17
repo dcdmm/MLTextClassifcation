@@ -57,7 +57,7 @@ class TextRNN_att(nn.Module):
         # *************************Attention过程*************************
         # Q,K,V都是out(类似加性注意力)
         # u.shape=[batch_size, sen len, hidden_size * num directions]
-        u = self.W_w_b_w(out)
+        u = torch.tanh(self.W_w_b_w(out))
         # att.shape=[batch_size, sen len, 1]
         att = self.u_w(u)
         att_score = F.softmax(att, dim=1)

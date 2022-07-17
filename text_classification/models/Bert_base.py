@@ -7,18 +7,19 @@ class Bert_base(torch.nn.Module):
 
     def __init__(self, pretrained_model, num_class, criterion, dropout_ratio=0.3):
         super().__init__()
-        self.fc = torch.nn.Linear(768, num_class)
         self.pretrained = pretrained_model
+        self.hidden_size = pretrained_model.config.hidden_size
+        self.fc = torch.nn.Linear(self.h_size, num_class)
         self.criterion = criterion
         self.dropout = nn.Dropout(dropout_ratio)
 
     def forward(self, input_ids, attention_mask, token_type_ids, labels=None):
-        out = self.pretrained(input_ids=input_ids,
+        model_output = self.pretrained(input_ids=input_ids,
                               attention_mask=attention_mask,
                               token_type_ids=token_type_ids)
 
-
-        out = self.fc(self.dropout(out.pooler_output))
+        # model_output.pooler_output.shape=[batch_size, self.hidden_size]
+        out = self.fc(self.dropout(model_output.pooler_output))
         out = out.softmax(dim=1)
         loss = None
         if labels is not None:  # 若包含标签
