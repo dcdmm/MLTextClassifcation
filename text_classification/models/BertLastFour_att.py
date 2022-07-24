@@ -55,7 +55,7 @@ class BertLastFour_att(torch.nn.Module):
         head_logits = self.head(concatenate_pooling)  # 最后4层的注意力权重(可选)
 
         # out.shape=[batch_size, self.hidden_size *8]
-        out = self.fc(torch.cat([head_logits, cls_pooling], -1))  # 拼接
+        out = self.fc(self.dropout(torch.cat([head_logits, cls_pooling], -1)))  # 拼接
         out = out.softmax(dim=1)
         loss = None
         if labels is not None:  # 若包含标签
