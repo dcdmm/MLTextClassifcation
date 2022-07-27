@@ -15,8 +15,8 @@ class Bert_base(torch.nn.Module):
 
     def forward(self, input_ids, attention_mask, token_type_ids, labels=None):
         model_output = self.pretrained(input_ids=input_ids,
-                              attention_mask=attention_mask,
-                              token_type_ids=token_type_ids)
+                                       attention_mask=attention_mask,
+                                       token_type_ids=token_type_ids)
 
         # model_output.pooler_output.shape=[batch_size, self.hidden_size]
         out = self.fc(self.dropout(model_output.pooler_output))

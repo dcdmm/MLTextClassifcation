@@ -41,8 +41,8 @@ class BertLastFour_att(torch.nn.Module):
 
     def forward(self, input_ids, attention_mask, token_type_ids, labels=None):
         model_output = self.pretrained(input_ids=input_ids,
-                              attention_mask=attention_mask,
-                              token_type_ids=token_type_ids)
+                                       attention_mask=attention_mask,
+                                       token_type_ids=token_type_ids)
         # all_hidden_states.shape=[pretrained_model.config.num_hidden_layers + 1, batch_size, sequence_length, self.hidden_size]
         all_hidden_states = torch.stack(model_output.hidden_states)
         # concatenate_pooling.shape=[batch_size, sequence_length, self.hidden_size * 4]

@@ -55,6 +55,7 @@ class TextRNN_att(nn.Module):
         out, hidden = self.rnn(embedded)
 
         # *************************Attention过程*************************
+        # 对每个序列的输出计算注意力权重
         # Q,K,V都是out(类似加性注意力)
         # u.shape=[batch_size, sen len, hidden_size * num directions]
         u = torch.tanh(self.W_w_b_w(out))

@@ -16,9 +16,9 @@ class TextCNN(nn.Module):
         输出词向量的维度大小
     kernel_sizes : tuple
         一般来说:不同大小卷积核的组合通常优于同样大小的卷积核
-        不同卷积层卷积核的宽度;如kernel_sizes=(3, 4, 5)
+        不同卷积层卷积核的宽度;如:kernel_sizes=(3, 4, 5)
     num_channels : tuple
-        不同卷积层输出通道数;如num_channels=(100, 100, 100)
+        不同卷积层输出通道数;如:num_channels=(100, 100, 100)
     dropput_ratio : float
         dropout层p值
     """

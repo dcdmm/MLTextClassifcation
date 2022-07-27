@@ -48,6 +48,7 @@ class BertRNN(nn.Module):
 
         # last_hidden_state.shape=[batch_size, sequence_length, pretrained_model.config.hidden_size]
         last_hidden_state = out.last_hidden_state
+
         # hidden.shape=[num_layers * num directions, batch_size, hidden_size]
         out, hidden = self.rnn(last_hidden_state)
 
