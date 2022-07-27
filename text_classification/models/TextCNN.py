@@ -20,10 +20,10 @@ class TextCNN(nn.Module):
     num_channels : tuple
         不同卷积层输出通道数;如:num_channels=(100, 100, 100)
     dropput_ratio : float
-        dropout层p值
+        dropout层p值(建议在0.2到0.5之间,0.2比较建议)
     """
 
-    def __init__(self, num_class, vocab_size, embed_size, kernel_sizes, num_channels, dropout_ratio=0.3):
+    def __init__(self, num_class, vocab_size, embed_size, kernel_sizes, num_channels, dropout_ratio=0.2):
         super(TextCNN, self).__init__()
         self.embedding = nn.Embedding(vocab_size, embed_size, padding_idx=None)
         # 预训练的词嵌入层

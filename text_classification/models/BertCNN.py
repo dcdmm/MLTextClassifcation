@@ -20,10 +20,10 @@ class BertCNN(nn.Module):
     num_channels : tuple
         不同卷积层输出通道数;如:num_channels=(100, 100, 100)
     dropput_ratio : float
-        dropout层p值
+        dropout层p值(建议在0.2到0.5之间,0.2比较建议)
     """
 
-    def __init__(self, pretrained_model, num_class, criterion, kernel_sizes, num_channels, dropout_ratio=0.3):
+    def __init__(self, pretrained_model, num_class, criterion, kernel_sizes, num_channels, dropout_ratio=0.2):
         super(BertCNN, self).__init__()
         self.pretrained = pretrained_model
         self.criterion = criterion

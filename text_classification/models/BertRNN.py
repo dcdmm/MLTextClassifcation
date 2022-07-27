@@ -21,10 +21,10 @@ class BertRNN(nn.Module):
     bidirectional : bool
         是否为设置为双向循环神经网络
     dropout_ratio : float
-        元素归零的概率
+        元素归零的概率(建议在0.2到0.5之间,0.2比较建议)
     """
 
-    def __init__(self, pretrained_model, num_class, criterion, hidden_size, num_layers, bidirectional, dropout_ratio=0.3):
+    def __init__(self, pretrained_model, num_class, criterion, hidden_size, num_layers, bidirectional, dropout_ratio=0.2):
         super(BertRNN, self).__init__()
         self.pretrained = pretrained_model
         self.criterion = criterion
