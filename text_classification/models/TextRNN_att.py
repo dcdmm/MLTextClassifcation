@@ -16,7 +16,7 @@ class TextRNN_att(nn.Module):
     embedding_size : int
         输出词向量的维度大小
     hidden_size : int
-        隐含变量的维度大小(权重矩阵W_{ih}、W_{hh}中h的大小)
+        隐含变量的维度大小(即权重矩阵W_{ih}、W_{hh}中h的大小)
     num_layers : int
         循环神经网络层数
     bidirectional : bool

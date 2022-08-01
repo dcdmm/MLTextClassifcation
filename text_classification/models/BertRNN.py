@@ -15,7 +15,7 @@ class BertRNN(nn.Module):
     criterion : torch.nn.modules.loss
         损失函数
     hidden_size : int
-        隐含变量的维度大小(权重矩阵W_{ih}、W_{hh}中h的大小)
+        隐含变量的维度大小(即权重矩阵W_{ih}、W_{hh}中h的大小)
     num_layers : int
         循环神经网络层数
     bidirectional : bool
@@ -54,7 +54,7 @@ class BertRNN(nn.Module):
 
         if self.bidirectional:  # 双向时
             # hidden = [batch_size, hidden_size * num directions]
-            hidden = self.dropout(torch.cat((hidden[-2, :, :], hidden[-1, :, :]), dim=1))  # 利用前向后后向的信息
+            hidden = self.dropout(torch.cat((hidden[-2, :, :], hidden[-1, :, :]), dim=1))  # 这里利用前向和后向最后一个序列的信息
         else:
             hidden = self.dropout(hidden[-1, :, :])
         out = self.linear(hidden)  # result.shape=[batch_size, num_class]
