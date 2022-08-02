@@ -14,5 +14,5 @@ class Base(nn.Module):
         # text.shape=(N, L);其中L表示序列长度
         # embedded.shape=(N, L, C);其中C表示输出词向量的维度大小(即nn.Embedding类参数embedding_dim)
         embedded = self.embedding(text)
-        embedded_mean = torch.mean(embedded, dim=1)
+        embedded_mean = torch.mean(embedded, dim=1)  # 聚合操作
         return self.fc(embedded_mean)

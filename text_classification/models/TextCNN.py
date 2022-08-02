@@ -30,7 +30,7 @@ class TextCNN(nn.Module):
         self.constant_embedding = nn.Embedding(vocab_size, embed_size)
         self.dropout = nn.Dropout(p=dropout_ratio)
         self.decoder = nn.Linear(sum(num_channels), num_class)
-        self.pool = nn.AdaptiveMaxPool1d(1)
+        self.pool = nn.AdaptiveMaxPool1d(1)  # 聚合操作
         self.relu = nn.ReLU()
         # 通过nn.ModuleList()创建多个⼀维卷积层
         self.convs = nn.ModuleList()

@@ -28,7 +28,7 @@ class AttentionHead(nn.Module):
 
 
 class BertLastFour_att(torch.nn.Module):
-    """Bert最后四层隐藏层的连接 + Linear(transformer实现训练过程)"""
+    """Bert最后四层隐藏层的连接 + [最后一个序列, attention](transformer实现训练过程)"""
 
     def __init__(self, pretrained_model, num_class, criterion, dropout_ratio=0.2):
         super().__init__()
@@ -50,13 +50,16 @@ class BertLastFour_att(torch.nn.Module):
             (all_hidden_states[-1], all_hidden_states[-2], all_hidden_states[-3], all_hidden_states[-4]),
             -1)  # 最后四层隐藏层的连接
         # cls_pooling.shape=[batch_size, self.hidden_size * 4]
-        cls_pooling = concatenate_pooling[:, 0]
+        cls_pooling = concatenate_pooling[:, 0]  # 最后一个序列的信息
         # head_logits.shape=[batch_size, self.hidden_size * 4]
         head_logits = self.head(concatenate_pooling)  # 最后4层的注意力权重(可选)
-
         # out.shape=[batch_size, self.hidden_size *8]
-        out = self.fc(self.dropout(torch.cat([head_logits, cls_pooling], -1)))  # 拼接
+        out = torch.cat([head_logits, cls_pooling], -1)
+
+        # out.shape=[batch_size, num_class]
+        out = self.fc(self.dropout(out))  # 拼接
         out = out.softmax(dim=1)
+
         loss = None
         if labels is not None:  # 若包含标签
             loss = self.criterion(out, labels)

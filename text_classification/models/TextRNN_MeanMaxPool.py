@@ -1,11 +1,10 @@
-import torch
 import torch.nn as nn
-import torch.nn.functional as F
+import torch
 
 
-class TextRNN_att(nn.Module):
+class TextRNNMeanMaxPool(nn.Module):
     """
-    TextRNN + attention模型的pytorch实现(具体任务对应修改)
+    TextRNN + [MeanPool, MaxPool]模型的pytorch实现(具体任务对应修改)
 
     Parameters
     ---------
@@ -16,17 +15,17 @@ class TextRNN_att(nn.Module):
     embedding_size : int
         输出词向量的维度大小
     hidden_size : int
-        隐含变量的维度大小(即权重矩阵W_{ih}、W_{hh}中h的大小)
+        隐含变量的维度大小(权重矩阵W_{ih}、W_{hh}中h的大小)
     num_layers : int
         循环神经网络层数
     bidirectional : bool
         是否为设置为双向循环神经网络
     dropout_ratio : float
-        元素归零的概率(建议在0.2到0.5之间,0.2比较建议)
+        元素归零的概率
     """
 
     def __init__(self, num_class, vocab_size, embedding_size, hidden_size, num_layers, bidirectional, dropout_ratio=0.2):
-        super(TextRNN_att, self).__init__()
+        super(TextRNN_MeanMaxPool, self).__init__()
         self.bidirectional = bidirectional
         self.embed = nn.Embedding(vocab_size, embedding_size)
         self.rnn = nn.GRU(input_size=embedding_size,
@@ -40,11 +39,11 @@ class TextRNN_att(nn.Module):
             mul = 2
         else:
             mul = 1
-        self.linear = nn.Linear(hidden_size * mul, num_class)
+        self.linear1 = nn.Linear(hidden_size * mul * 2, 1024)
+        self.linear2 = nn.Linear(1024, num_class)
+        self.norm = nn.LayerNorm(normalized_shape=1024)
         self.dropout = nn.Dropout(dropout_ratio)
-
-        self.W_w_b_w = nn.Linear(hidden_size * mul, hidden_size * mul)  # 可学习参数:W_w, b_w
-        self.u_w = nn.Linear(hidden_size * mul, 1, bias=False)  # 可学习参数:u_w
+        self.relu = nn.ReLU()
 
     def forward(self, text):
         # text.shape=[batch_size, sent len]
@@ -53,21 +52,19 @@ class TextRNN_att(nn.Module):
         embedded = self.dropout(self.embed(text))
         # out.shape=[batch_size, sen len, hidden_size * num directions]  # 即h_{it}
         out, hidden = self.rnn(embedded)
-
-        # *************************Attention过程*************************
-        # 对每个序列的输出计算注意力权重
-        # Q,K,V都是out(类似加性注意力)
-        # u.shape=[batch_size, sen len, hidden_size * num directions]
-        u = torch.tanh(self.W_w_b_w(out))
-        # att.shape=[batch_size, sen len, 1]
-        att = self.u_w(u)
-        att_score = F.softmax(att, dim=1)
-        # score_out.shape=[batch_size, sen len, hidden_size * num directions]  # 广播机制
-        score_out = out * att_score
-        # *************************Attention过程*************************
-
-        # feat.shape=[batch_size, hidden_size * num directions]
-        feat = torch.sum(score_out, dim=1)  # 聚合操作
+        
+        # feat_mean.shape=[batch_size, hidden_size * num directions]
+        feat_mean = torch.mean(out, dim=1)  # 聚合操作
+        # feat_max.shape=[batch_size, hidden_size * num directions]
+        feat_max = torch.max(out, dim=1).values  # 聚合操作
+        # result.shape=[batch_size, hidden_size * num directions * 2]
+        result = torch.cat((feat_mean, feat_max), 1)
+        
+        # result.shape=[batch_size, 1024]
+        result = self.linear1(result)
+        result = self.norm(result)
+        result = self.relu(result)
+        result = self.dropout(result)
         # result.shape=[batch_size, num_class]
-        result = self.linear(feat)
+        result = self.linear2(result)
         return result

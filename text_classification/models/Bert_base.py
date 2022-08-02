@@ -19,8 +19,9 @@ class Bert_base(torch.nn.Module):
                                        token_type_ids=token_type_ids)
 
         # model_output.pooler_output.shape=[batch_size, self.hidden_size]
-        out = self.fc(self.dropout(model_output.pooler_output))
+        out = self.fc(self.dropout(model_output.pooler_output))  # 最后一个序列的信息
         out = out.softmax(dim=1)
+
         loss = None
         if labels is not None:  # 若包含标签
             loss = self.criterion(out, labels)
