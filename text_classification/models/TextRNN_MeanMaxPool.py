@@ -2,7 +2,7 @@ import torch.nn as nn
 import torch
 
 
-class TextRNNMeanMaxPool(nn.Module):
+class TextRNN_MeanMaxPool(nn.Module):
     """
     TextRNN + [MeanPool, MaxPool]模型的pytorch实现(具体任务对应修改)
 
