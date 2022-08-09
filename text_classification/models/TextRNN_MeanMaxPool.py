@@ -62,7 +62,7 @@ class TextRNN_MeanMaxPool(nn.Module):
         
         # result.shape=[batch_size, 1024]
         result = self.linear1(result)
-        result = self.norm(result)
+        result = self.norm(result)  # 归一化层一般防止全连接/卷积层之后
         result = self.relu(result)
         result = self.dropout(result)
         # result.shape=[batch_size, num_class]

@@ -1,7 +1,6 @@
 import torch.nn as nn
 import torch
 
-
 class BertLastFour_MeanMaxPool(torch.nn.Module):
     """Bert最后四层隐藏层的连接 + [MeanPool, MaxPool](transformer实现训练过程)"""
 
@@ -36,7 +35,7 @@ class BertLastFour_MeanMaxPool(torch.nn.Module):
         
         # result.shape=[batch_size, 1024]
         result = self.linear1(result)
-        result = self.norm(result)
+        result = self.norm(result)  # 归一化层一般防止全连接/卷积层之后
         result = self.relu(result)
         result = self.dropout(result)
         # result.shape=[batch_size, num_class]
