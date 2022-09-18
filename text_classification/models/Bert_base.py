@@ -9,7 +9,7 @@ class Bert_base(torch.nn.Module):
         super().__init__()
         self.pretrained = pretrained_model
         self.hidden_size = pretrained_model.config.hidden_size
-        self.fc = torch.nn.Linear(self.h_size, num_class)
+        self.fc = torch.nn.Linear(self.hidden_size, num_class)
         self.criterion = criterion
         self.dropout = nn.Dropout(dropout_ratio)
 
