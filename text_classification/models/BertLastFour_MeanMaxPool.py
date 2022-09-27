@@ -1,6 +1,7 @@
 import torch.nn as nn
 import torch
 
+
 class BertLastFour_MeanMaxPool(torch.nn.Module):
     """Bert最后四层隐藏层的连接 + [MeanPool, MaxPool](transformer实现训练过程)"""
 
@@ -17,22 +18,23 @@ class BertLastFour_MeanMaxPool(torch.nn.Module):
 
     def forward(self, input_ids, attention_mask, token_type_ids, labels=None):
         model_output = self.pretrained(input_ids=input_ids,
-                              attention_mask=attention_mask,
-                              token_type_ids=token_type_ids)
+                                       attention_mask=attention_mask,
+                                       token_type_ids=token_type_ids)
         # all_hidden_states.shape=[pretrained_model.config.num_hidden_layers + 1, batch_size, sequence_length, self.hidden_size]
         all_hidden_states = torch.stack(model_output.hidden_states)
         # concatenate_pooling.shape=[batch_size, sequence_length, self.hidden_size * 4]
         concatenate_pooling = torch.cat(
-            (all_hidden_states[-1], all_hidden_states[-2], all_hidden_states[-3], all_hidden_states[-4]),
+            (all_hidden_states[-1], all_hidden_states[-2],
+             all_hidden_states[-3], all_hidden_states[-4]),
             -1)  # 最后四层隐藏层的连接
-        
+
         # mean_pooling.shape=[batch_size, self.hidden_size * 4]
         mean_pooling = torch.mean(concatenate_pooling, dim=1)  # 聚合操作
         # max_pooling.shape=[batch_size, self.hidden_size * 4]
         max_pooling = torch.max(concatenate_pooling, dim=1).values  # 聚合操作
         # result.shape=[batch_size, self.hidden_size * 8]
         result = torch.cat((mean_pooling, max_pooling), 1)
-        
+
         # result.shape=[batch_size, 1024]
         result = self.linear1(result)
         result = self.norm(result)  # 归一化层一般防止全连接/卷积层之后
@@ -41,7 +43,7 @@ class BertLastFour_MeanMaxPool(torch.nn.Module):
         # result.shape=[batch_size, num_class]
         result = self.linear2(result)
         result = result.softmax(dim=1)
-        
+
         loss = None
         if labels is not None:  # 若包含标签
             loss = self.criterion(result, labels)
