@@ -10,4 +10,4 @@
 *.pyc
 
 extra
-data_ag_news/datasets
+a_test_data_ag_news/datasets
