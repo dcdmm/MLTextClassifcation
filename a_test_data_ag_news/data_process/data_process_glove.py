@@ -1,6 +1,9 @@
 import pandas as pd
+# TODO ★★★★torchtext已停止更新维护,请替换
 from torchtext.data.utils import get_tokenizer
+# TODO ★★★★torchtext已停止更新维护,请替换
 from torchtext.vocab import build_vocab_from_iterator
+# TODO ★★★★torchtext已停止更新维护,请替换
 import torchtext
 import torch
 from torch.utils.data import DataLoader
