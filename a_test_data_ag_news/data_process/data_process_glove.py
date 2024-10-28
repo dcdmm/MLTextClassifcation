@@ -30,6 +30,7 @@ class DataProcess:
 
     def get_pre_trained(self, name, cache):
         r"""获取模型预训练词向量矩阵"""
+        # 加载预训练词向量文件
         vec1 = torchtext.vocab.Vectors(name=name,
                                        cache=cache)
         pre_trained = vec1.get_vecs_by_tokens(self.vocab.get_itos())
