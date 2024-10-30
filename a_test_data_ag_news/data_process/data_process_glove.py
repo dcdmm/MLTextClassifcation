@@ -1,52 +1,160 @@
 import pandas as pd
-from torchtext.data.utils import get_tokenizer
-from torchtext.vocab import build_vocab_from_iterator
-import torchtext
+import re
+import collections
 import torch
 from torch.utils.data import DataLoader
+import jsonlines
+from tqdm.notebook import tqdm
+
+
+def tokenizer(line):
+    """基础英文分词器"""
+    _patterns = [r"\'", r"\"", r"\.", r"<br \/>", r",", r"\(", r"\)", r"\!", r"\?", r"\;", r"\:", r"\s+"]
+    _replacements = [" '  ", "", " . ", " ", " , ", " ( ", " ) ", " ! ", " ? ", " ", " ", " "]
+    _patterns_dict = list((re.compile(p), r) for p, r in zip(_patterns, _replacements))
+    line = line.lower()
+    for pattern_re, replaced_str in _patterns_dict:
+        line = pattern_re.sub(replaced_str, line)
+    return line.split()
+
+
+class Vocab:
+    """
+    Vocabulary for text
+    """
+
+    def __init__(self, tokens=None, min_freq=2, reserved_tokens=None):
+        # tokens: 单词tokens
+        # min_freq: The minimum frequency needed to include a token in the vocabulary.
+        # reserved_tokens: 自定义tokens
+        if tokens is None:
+            tokens = []
+        if reserved_tokens is None:
+            reserved_tokens = []
+        counter = collections.Counter(tokens)
+        # Sort according to frequencies
+        self._token_freqs = sorted(counter.items(), key=lambda x: x[1], reverse=True)
+        # The index for the unknown token is 0
+        self.idx_to_token = ['<unk>'] + reserved_tokens
+        self.token_to_idx = {token: idx for idx, token in enumerate(self.idx_to_token)}
+        for token, freq in self._token_freqs:
+            if freq < min_freq:
+                break
+            if token not in self.token_to_idx:
+                self.idx_to_token.append(token)
+                self.token_to_idx[token] = len(self.idx_to_token) - 1
+
+    def __len__(self):
+        return len(self.idx_to_token)
+
+    def __getitem__(self, tokens):
+        if not isinstance(tokens, (list, tuple)):
+            return self.token_to_idx.get(tokens, self.unk)  # 未在字典中则返回'<unk>'
+        return [self.__getitem__(token) for token in tokens]  # 递归
+
+    def to_tokens(self, indices):
+        """第indices位置处的token"""
+        if not isinstance(indices, (list, tuple)):
+            return self.idx_to_token[indices]
+        return [self.idx_to_token[index] for index in indices]
+
+    @property
+    def unk(self):
+        """Index for the unknown token"""
+        return 0
+
+    @property
+    def token_freqs(self):
+        return self._token_freqs
+
+
+class Vectors:
+    def __init__(self, name, max_vectors=None) -> None:
+        self.vectors = None
+        self.name = name
+        self.max_vectors = max_vectors
+        self.itos = None
+        self.stoi = None
+        self.cache()
+
+    def cache(self):
+        with open(self.name, "r", encoding='utf-8') as f:
+            read_value = f.readlines()
+
+        all_value, itos = [], []
+        for i in tqdm(range(len(read_value))):
+            l_split = read_value[i].split(' ')
+            itos.append(l_split[0])
+            all_value.append([float(i.strip()) for i in l_split[1: ]])
+        all_value = torch.tensor(all_value)
+        self.vectors = all_value
+        self.itos = itos
+        num_lines = len(self.vectors)
+        if not self.max_vectors or self.max_vectors > num_lines:
+            self.max_vectors = num_lines
+        self.vectors = self.vectors[:self.max_vectors, :]
+        self.itos = self.itos[:self.max_vectors]
+        self.stoi = {word: i for i, word in enumerate(self.itos)}
+
+    def __len__(self):
+        return len(self.vectors)
+    
+    def __getitem__(self, token):
+        if token in self.stoi:
+            return self.vectors[self.stoi[token]]
+        else:
+            dim = self.vectors.shape[1]
+            return torch.Tensor.zero_(torch.Tensor(dim))
+        
+    def get_vecs_by_tokens(self, tokens):
+        indices = [self[token] for token in tokens]
+        vecs = torch.stack(indices)
+        return vecs
 
 
 class DataProcess:
     def __init__(self, train_path, test_path, device, batch_size=16):
-        self.train_df = pd.read_csv(train_path)
-        self.test_df = pd.read_csv(test_path)
+        train_lst = []
+        with open(train_path, encoding='utf-8') as fp:
+            for item in jsonlines.Reader(fp):
+                train_lst.append(item)
+        self.train_df = pd.DataFrame(train_lst)
+        test_lst = []
+        with open(test_path, encoding='utf-8') as fp:
+            for item in jsonlines.Reader(fp):
+                test_lst.append(item)
+        self.test_df = pd.DataFrame(test_lst)
         self.device = device
         self.batch_size = batch_size
-        self.tokenizer = get_tokenizer(tokenizer='basic_english')
+        self.tokenizer = tokenizer
         self.vocab = self.build_vocab()
 
     def build_vocab(self):
         r"""构建词表"""
-
-        def yield_tokens(data_iter):
-            for _, ser in data_iter:
-                yield self.tokenizer(ser['text'])  # 分词
-
-        vocab = build_vocab_from_iterator(yield_tokens(self.train_df.iterrows()))
-        vocab.insert_token("<unk>", 0)
-        vocab.insert_token("<pad>", 1)
-        vocab.set_default_index(0)
+        split_list = []
+        for _, ser in self.train_df.iterrows():
+            split_list.extend(tokenizer(ser['text']))
+        
+        vocab = Vocab(split_list, min_freq=1, reserved_tokens=['<pad>'])
         return vocab
-
-    def get_pre_trained(self, name, cache):
+        
+    def get_pre_trained(self, name):
         r"""获取模型预训练词向量矩阵"""
         # 加载预训练词向量文件
-        vec1 = torchtext.vocab.Vectors(name=name,
-                                       cache=cache)
-        pre_trained = vec1.get_vecs_by_tokens(self.vocab.get_itos())
+        vec1 = Vectors(name=name)
+        pre_trained = vec1.get_vecs_by_tokens(self.vocab.idx_to_token)
         return pre_trained
 
     def get_dataLoader(self,
                        text_max_len):  # 句子最大长度(超过该长度将被截断)
         r"""获取DataLoade"""
-        label_pipeline = lambda label: int(label) - 1  # ★★★★使分类标签从0开始
-        text_pipeline = lambda line: [self.vocab([i])[0] for i in self.tokenizer(line)]
+        text_pipeline = lambda line: [self.vocab[token] for token in tokenizer(line)]
 
         def collate_batch(batch):
             label_list = []  # 分类标签
             text_list = []
-            for (_label, _text) in batch:
-                label_list.append(label_pipeline(_label))
+            for _text, _label, _ in batch:
+                label_list.append(_label)
                 processed_text = torch.tensor(
                     DataProcess.truncate_pad(text_pipeline(_text), text_max_len, self.vocab['<pad>']),
                     dtype=torch.int64)
@@ -89,9 +197,12 @@ class DataProcess:
 
 if __name__ == '__main__':
     cpu_or_gpu = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    dp = DataProcess('../datasets/train.csv', '../datasets/test.csv', cpu_or_gpu)
+    dp = DataProcess('train.jsonl', 'test.jsonl', cpu_or_gpu)
     print(dp.vocab)
     train_loader, test_loader = dp.get_dataLoader(141)
-    print(train_loader)
-    pre_vector = dp.get_pre_trained("glove.6B.50d.txt", '../../extra/glove_vector/')
+    for i in train_loader:
+        print(i)
+        break
+    pre_vector = dp.get_pre_trained("glove.6B.50d.txt")
     print(pre_vector.shape)
+    print(pre_vector)

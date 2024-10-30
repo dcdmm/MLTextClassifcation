@@ -2,13 +2,18 @@ import torch.utils.data as Data
 import pandas as pd
 import torch
 from transformers import BertTokenizer
+import jsonlines
 
 
 class Dataset(Data.Dataset):
     """定义数据集"""
 
     def __init__(self, file_path):
-        self.dataset = pd.read_csv(file_path)
+        lst = []
+        with open(file_path, encoding='utf-8') as fp:
+            for item in jsonlines.Reader(fp):
+                lst.append(item)
+        self.dataset = pd.DataFrame(lst)
 
     # 必须实现__len__魔法方法
     def __len__(self):
@@ -40,7 +45,7 @@ def get_collate_fn(tokenizer, max_len=512):
         for name in model_input_names:
             result[name] = text_token[name]
 
-        labels = [i[1] - 1 for i in data]  # ★★★★使分类标签从0开始
+        labels = [i[1] for i in data]
         labels = torch.LongTensor(labels)
         result['labels'] = labels  # ★★★★对应模型forward方法labels参数
         return result
@@ -50,7 +55,7 @@ def get_collate_fn(tokenizer, max_len=512):
 
 if __name__ == '__main__':
     token = BertTokenizer.from_pretrained('bert-base-uncased')
-    dataset_test = Dataset('../datasets/test.csv')
+    dataset_test = Dataset('../datasets/test.jsonl')
     dataLoader = Data.DataLoader(dataset=dataset_test, batch_size=4, collate_fn=get_collate_fn(token))
     for i in dataLoader:
         print(i)
